@@ -15,11 +15,12 @@ export class AppComponent {
   peer: Peer | undefined;
   message = ''
   messages: string[] = [];
+  otherPeerId = '';
 
   createPeer() {
     if (!this.peer) {
       this.peer = new Peer("maanyanaaya-dheeraj");
-      this.peer;
+      this.receive();
     }
   }
 
@@ -36,7 +37,7 @@ export class AppComponent {
 
   send() {
     if (this.peer) {
-      const conn = this.peer.connect("alavalaathi-rubeena");
+      const conn = this.peer.connect(this.otherPeerId);
       conn.on("open", () => {
         conn.send(this.message);
       });
