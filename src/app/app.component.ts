@@ -22,8 +22,8 @@ export class AppComponent {
   peer: Peer | undefined;
   message = ''
   messages: IMessage[] = [];
-  myPeerId = "maanyanaaya-dheeraj";
-  otherPeerId = "alavalaathi-rubeena";
+  myPeerId = "";
+  otherPeerId = "";
 
   createPeer() {
     if (!this.peer) {
@@ -55,16 +55,17 @@ export class AppComponent {
     }
     if (this.peer) {
       const time = new Date();
+      const message = this.message;
       const myMessage: IMessage = {
         peer: 'me',
         time: time,
-        message: this.message
+        message: message
       };
-      this.messages = [...this.messages, myMessage]
+      this.message = '';
+      this.messages = [...this.messages, myMessage];
       const conn = this.peer.connect(this.otherPeerId);
       conn.on("open", () => {
-        conn.send(this.message);
-        this.message = '';
+        conn.send(message);
       });
     }
   }

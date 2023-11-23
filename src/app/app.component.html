@@ -1,8 +1,40 @@
-<input type="text" [(ngModel)]="myPeerId" placeholder="myPeerId">
-<input type="text" [(ngModel)]="otherPeerId" placeholder="otherPeerId">
-<button (click)="createPeer()">Start</button>
-<textarea type="text" [(ngModel)]="message" name="" id="" cols="0" rows="5"></textarea>
-<button type="submit" (click)="send()">Send</button>
-<div *ngFor="let item of messages">{{item.peer}}{{item.time}}{{item.message}}</div>
-
-<router-outlet></router-outlet>
+<div class="flex flex-col items-center justify-start pt-10 w-full">
+  <div class="flex flex-col justify-start gap-5 border border-black p-5">
+    <div class="flex justify-between gap-5">
+      <button class="border border-black w-20" (click)="createPeer()">Start</button>
+      <div class="flex justify-end gap-2">
+        <input class="border border-black text-right" type="text" [(ngModel)]="myPeerId" placeholder="My peer id">
+        <input class="border border-black text-right" type="text" [(ngModel)]="otherPeerId" placeholder="Other peer id">
+      </div>
+    </div>
+    <div class="h-96 overflow-auto">
+      @for (item of messages; track $index) {
+      @if (item.peer==='sender') {
+      <div class="text-left flex flex-col items-start pt-3">
+        <div class="flex gap-2">
+          <div>{{item.time | date:'h:mm:ss a'}}</div>
+          <div>{{item.peer}}</div>
+        </div>
+        <div class="max-w-xs break-words">{{item.message}}</div>
+      </div>
+      }
+      @if (item.peer==='me') {
+      <div class="text-right flex flex-col items-end pt-3">
+        <div class="flex gap-2">
+          <div>{{item.time | date:'h:mm:ss a'}}</div>
+          <div>{{item.peer}}</div>
+        </div>
+        <div class="max-w-xs break-words">{{item.message}}</div>
+      </div>
+      }
+      }
+    </div>
+    <div class="relative">
+      <div class="absolute bottom-3 right-2">
+        <button class="border border-black w-20" type="submit" (click)="send()">Send</button>
+      </div>
+      <textarea class="border border-black w-full" type="text" [(ngModel)]="message" name="" id="" cols="60"
+        rows="3"></textarea>
+    </div>
+  </div>
+</div>
