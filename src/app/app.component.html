@@ -1,7 +1,8 @@
-<input type="text" [(ngModel)]="otherPeerId">
+<input type="text" [(ngModel)]="myPeerId" placeholder="myPeerId">
+<input type="text" [(ngModel)]="otherPeerId" placeholder="otherPeerId">
 <button (click)="createPeer()">Start</button>
 <textarea type="text" [(ngModel)]="message" name="" id="" cols="0" rows="5"></textarea>
-<button (click)="send()">Send</button>
-<div *ngFor="let item of messages">{{messages}}</div>
+<button type="submit" (click)="send()">Send</button>
+<div *ngFor="let item of messages">{{item.peer}}{{item.time}}{{item.message}}</div>
 
 <router-outlet></router-outlet>
