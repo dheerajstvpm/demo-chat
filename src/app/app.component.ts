@@ -22,8 +22,8 @@ export class AppComponent {
   peer: Peer | undefined;
   message = ''
   messages: IMessage[] = [];
-  myPeerId = "";
-  otherPeerId = "";
+  myPeerId = "maanyanaaya-dheeraj";
+  otherPeerId = "alavalaathi-rubeena";
 
   createPeer() {
     if (!this.peer) {
@@ -49,6 +49,18 @@ export class AppComponent {
     }
   }
 
+  onCall() {
+    if (this.peer) {
+      this.peer.on("call", async (call) => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        call.answer(stream); // Answer the call with an A/V stream.
+        call.on("stream", (remoteStream) => {
+          // Show stream in some <video> element.
+        });
+      });
+    }
+  }
+
   send() {
     if (this.message === '') {
       return;
@@ -69,4 +81,15 @@ export class AppComponent {
       });
     }
   }
+
+  async call() {
+    if (this.peer) {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const call = this.peer.call(this.otherPeerId, stream);
+      call.on("stream", (remoteStream) => {
+        // Show stream in some <video> element.
+      });
+    }
+  }
+
 }
