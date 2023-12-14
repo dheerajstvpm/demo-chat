@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Peer } from "peerjs";
 
 export interface IMessage {
@@ -17,6 +17,9 @@ export class AppComponent {
 
   constructor() { }
 
+  @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
+
   title = 'demo-chat';
 
   peer: Peer | undefined;
@@ -28,11 +31,12 @@ export class AppComponent {
   createPeer() {
     if (!this.peer) {
       this.peer = new Peer(this.myPeerId);
-      this.receive();
+      this.onReceive();
+      this.onCall();
     }
   }
 
-  receive() {
+  onReceive() {
     if (this.peer) {
       this.peer.on("connection", (conn) => {
         conn.on("data", (data) => {
@@ -53,9 +57,11 @@ export class AppComponent {
     if (this.peer) {
       this.peer.on("call", async (call) => {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        this.localVideo.nativeElement.srcObject = stream;
         call.answer(stream); // Answer the call with an A/V stream.
         call.on("stream", (remoteStream) => {
           // Show stream in some <video> element.
+          this.remoteVideo.nativeElement.srcObject = remoteStream;
         });
       });
     }
@@ -85,9 +91,11 @@ export class AppComponent {
   async call() {
     if (this.peer) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.localVideo.nativeElement.srcObject = stream;
       const call = this.peer.call(this.otherPeerId, stream);
       call.on("stream", (remoteStream) => {
         // Show stream in some <video> element.
+        this.remoteVideo.nativeElement.srcObject = remoteStream;
       });
     }
   }
