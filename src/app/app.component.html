@@ -1,5 +1,5 @@
 <div class="flex flex-col items-center justify-start w-full h-screen">
-  <div class="flex flex-col justify-start gap-2 border border-gray-400 p-2 h-full">
+  <div class="flex flex-col justify-start gap-2 p-2 h-full w-full">
     <div class="flex justify-between gap-2">
       <button class="border border-black rounded w-16" (click)="createPeer()">
         Start
@@ -26,7 +26,7 @@
           <div>{{ item.time | date : "h:mm:ss a" }}</div>
           <div>{{ item.peer }}</div>
         </div>
-        <div class="max-w-xs break-words">{{ item.message }}</div>
+        <div class="break-words">{{ item.message }}</div>
       </div>
       } @if (item.peer==='me') {
       <div class="text-right flex flex-col items-end pt-3">
@@ -34,7 +34,7 @@
           <div>{{ item.time | date : "h:mm:ss a" }}</div>
           <div>{{ item.peer }}</div>
         </div>
-        <div class="max-w-xs break-words">{{ item.message }}</div>
+        <div class="break-words">{{ item.message }}</div>
       </div>
       } }
     </div>
