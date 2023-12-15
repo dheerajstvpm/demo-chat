@@ -1,21 +1,19 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Peer } from "peerjs";
+import { Peer } from 'peerjs';
 
 export interface IMessage {
-  peer: string,
-  time: Date,
-  message: string
+  peer: string;
+  time: Date;
+  message: string;
 }
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-
 export class AppComponent {
-
-  constructor() { }
+  constructor() {}
 
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
@@ -23,10 +21,10 @@ export class AppComponent {
   title = 'demo-chat';
 
   peer: Peer | undefined;
-  message = ''
+  message = '';
   messages: IMessage[] = [];
-  myPeerId = "maanyanaaya-dheeraj";
-  otherPeerId = "alavalaathi-rubeena";
+  myPeerId = crypto.randomUUID();
+  otherPeerId!: string;
 
   createPeer() {
     if (!this.peer) {
@@ -38,15 +36,15 @@ export class AppComponent {
 
   onReceive() {
     if (this.peer) {
-      this.peer.on("connection", (conn) => {
-        conn.on("data", (data) => {
+      this.peer.on('connection', (conn) => {
+        conn.on('data', (data) => {
           const time = new Date();
           const peerMessage: IMessage = {
             peer: 'sender',
             time: time,
-            message: data as string
+            message: data as string,
           };
-          this.messages = [...this.messages, peerMessage]
+          this.messages = [...this.messages, peerMessage];
           console.log(data);
         });
       });
@@ -55,11 +53,14 @@ export class AppComponent {
 
   onCall() {
     if (this.peer) {
-      this.peer.on("call", async (call) => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.peer.on('call', async (call) => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
         this.localVideo.nativeElement.srcObject = stream;
         call.answer(stream); // Answer the call with an A/V stream.
-        call.on("stream", (remoteStream) => {
+        call.on('stream', (remoteStream) => {
           // Show stream in some <video> element.
           this.remoteVideo.nativeElement.srcObject = remoteStream;
         });
@@ -77,12 +78,12 @@ export class AppComponent {
       const myMessage: IMessage = {
         peer: 'me',
         time: time,
-        message: message
+        message: message,
       };
       this.message = '';
       this.messages = [...this.messages, myMessage];
       const conn = this.peer.connect(this.otherPeerId);
-      conn.on("open", () => {
+      conn.on('open', () => {
         conn.send(message);
       });
     }
@@ -90,14 +91,16 @@ export class AppComponent {
 
   async call() {
     if (this.peer) {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       this.localVideo.nativeElement.srcObject = stream;
       const call = this.peer.call(this.otherPeerId, stream);
-      call.on("stream", (remoteStream) => {
+      call.on('stream', (remoteStream) => {
         // Show stream in some <video> element.
         this.remoteVideo.nativeElement.srcObject = remoteStream;
       });
     }
   }
-
 }
