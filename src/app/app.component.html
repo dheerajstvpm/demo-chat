@@ -22,25 +22,21 @@
     <div
       class="video-container absolute w-full h-full top-0 left-0 flex justify-center items-center"
     >
-      <div class="w-full h-full flex justify-center items-center">
-        <div class="relative">
+      <div class="w-full h-full relative">
           <video
             #remoteVideo
-            id="remote-video"
-            class="w-full h-full"
+            class="remote-video w-full h-full"
             poster="./assets/video-placeholder.jpg"
             autoplay
             playsinline
           ></video>
           <video
             #localVideo
-            id="local-video"
-            class="absolute top-0 left-0 w-1/4 min-w-[200px]"
+            class="local-video absolute top-20 left-2 w-1/4 rounded"
             autoplay
             playsinline
             [muted]="true"
           ></video>
-        </div>
       </div>
     </div>
     <div class="chat-container absolute bottom-16 right-2 w-full">
