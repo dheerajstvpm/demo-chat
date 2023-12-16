@@ -22,26 +22,28 @@
     <div
       class="video-container absolute w-full h-full top-0 left-0 flex justify-center items-center"
     >
-      <div class="w-full h-full relative">
-        <video
-          #remoteVideo
-          id="remote-video"
-          class="w-full h-full min-w-[200px]"
-          poster="./assets/video-placeholder.jpg"
-          autoplay
-          playsinline
-        ></video>
-        <video
-          #localVideo
-          id="local-video"
-          class="absolute top-0 left-0 w-1/4"
-          autoplay
-          playsinline
-          [muted]="true"
-        ></video>
+      <div class="w-full h-full flex justify-center items-center">
+        <div class="relative">
+          <video
+            #remoteVideo
+            id="remote-video"
+            class="w-full h-full"
+            poster="./assets/video-placeholder.jpg"
+            autoplay
+            playsinline
+          ></video>
+          <video
+            #localVideo
+            id="local-video"
+            class="absolute top-0 left-0 w-1/4 min-w-[200px]"
+            autoplay
+            playsinline
+            [muted]="true"
+          ></video>
+        </div>
       </div>
     </div>
-    <div class="chat-container absolute bottom-2 right-2 w-full">
+    <div class="chat-container absolute bottom-16 right-2 w-full">
       <div class="chat-text overflow-auto text-sm font-bold">
         @for (item of messages; track $index) { @if (item.peer==='sender') {
         <div class="text-left flex flex-col items-start pt-3">
