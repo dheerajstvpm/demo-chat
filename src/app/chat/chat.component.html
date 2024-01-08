@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center justify-start w-full h-screen">
   <div class="flex flex-col justify-between p-2 h-full w-full relative">
     <div class="flex justify-between gap-2 z-10">
-      <button class="border border-black rounded w-16" (click)="createPeer()">
+      <button class="border border-black bg-white rounded w-16" (click)="createPeer()">
         Start
       </button>
       <div class="flex-1 flex flex-col items-end justify-start gap-2">
@@ -23,21 +23,21 @@
       class="video-container absolute w-full h-full top-0 left-0 flex justify-center items-center"
     >
       <div class="w-full h-full relative" id="dragBoundary">
-          <video
-            #remoteVideo
-            class="remote-video w-full h-full"
-            autoplay
-            playsinline
-          ></video>
-          <video
-            #localVideo
-            cdkDragBoundary="#dragBoundary"
-            cdkDrag
-            class="local-video absolute top-20 left-2 w-1/4 rounded z-50 cursor-grab"
-            autoplay
-            playsinline
-            [muted]="true"
-          ></video>
+        <video
+          #remoteVideo
+          class="remote-video w-full h-full bg-transparent"
+          autoplay
+          playsinline
+        ></video>
+        <video
+          #localVideo
+          cdkDragBoundary="#dragBoundary"
+          cdkDrag
+          class="local-video absolute top-20 left-2 w-1/4 rounded z-50 cursor-grab"
+          autoplay
+          playsinline
+          [muted]="true"
+        ></video>
       </div>
     </div>
     <div class="chat-container absolute bottom-16 right-2 w-full">
@@ -63,11 +63,36 @@
     </div>
     <div class="flex gap-2 z-10">
       <button
-        class="border border-black rounded w-16"
+        *ngIf="!callConnected"
+        class="border border-black bg-white rounded w-16"
         type="submit"
         (click)="call()"
       >
         Call
+      </button>
+      <button
+        *ngIf="callConnected"
+        class="border border-black bg-white rounded w-16"
+        type="submit"
+        (click)="disconnect()"
+      >
+        Disconnect
+      </button>
+      <button
+        *ngIf="!muted"
+        class="border border-black bg-white rounded w-16"
+        type="submit"
+        (click)="mute()"
+      >
+        Mute
+      </button>
+      <button
+        *ngIf="muted"
+        class="border border-black bg-white rounded w-16"
+        type="submit"
+        (click)="unmute()"
+      >
+        Unmute
       </button>
       <textarea
         class="w-full border border-gray-400"
@@ -79,7 +104,7 @@
         rows="2"
       ></textarea>
       <button
-        class="border border-black rounded w-16"
+        class="border border-black bg-white rounded w-16"
         type="submit"
         (click)="send()"
       >
