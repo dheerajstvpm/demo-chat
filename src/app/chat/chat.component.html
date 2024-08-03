@@ -1,24 +1,21 @@
 <div class="flex flex-col items-center justify-start w-full h-[100dvh]">
   <div class="flex flex-col justify-between p-2 h-full w-full relative">
-    <div class="flex justify-between gap-2 z-10">
-      <button class="border border-black bg-white rounded w-16" (click)="createPeer()">
-        Start
-      </button>
-      <div class="flex-1 flex flex-col items-end justify-start gap-2">
-        <input
-          class="border border-gray-400 rounded text-right w-full"
-          type="text"
-          [(ngModel)]="myPeerId"
-          placeholder="My peer id"
-        />
-        <input
-          class="border border-gray-400 rounded text-right w-full"
-          type="text"
-          [(ngModel)]="otherPeerId"
-          placeholder="Other peer id"
-        />
-      </div>
+    <!-- <div class="flex justify-between gap-2 z-10"> -->
+    <div class="flex flex-col gap-2 z-10">
+      <input
+        class="border border-gray-400 rounded text-right w-full"
+        type="text"
+        [(ngModel)]="myPeerId"
+        placeholder="My peer id"
+      />
+      <input
+        class="border border-gray-400 rounded text-right w-full"
+        type="text"
+        [(ngModel)]="otherPeerId"
+        placeholder="Other peer id"
+      />
     </div>
+    <!-- </div> -->
     <div
       class="video-container absolute w-full h-full top-0 left-0 flex justify-center items-center"
     >
@@ -40,11 +37,11 @@
         ></video>
       </div>
     </div>
-    <div class="chat-container absolute bottom-16 right-2 w-full">
-      <div class="chat-text overflow-auto text-sm font-bold">
+    <div class="chat-container absolute bottom-16 right-0 w-full">
+      <div class="chat-text overflow-auto text-sm font-bold p-2">
         @for (item of messages; track $index) { @if (item.peer==='sender') {
         <div class="text-left flex flex-col items-start pt-3">
-          <div class="flex gap-2">
+          <div class="flex gap-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
             <div>{{ item.time | date : "h:mm:ss a" }}</div>
             <div>{{ item.peer }}</div>
           </div>
@@ -52,7 +49,7 @@
         </div>
         } @if (item.peer==='me') {
         <div class="text-right flex flex-col items-end pt-3">
-          <div class="flex gap-2">
+          <div class="flex gap-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
             <div>{{ item.time | date : "h:mm:ss a" }}</div>
             <div>{{ item.peer }}</div>
           </div>
@@ -78,22 +75,22 @@
       >
         Disconnect
       </button>
+      @if (callConnected) {
       <button
-        *ngIf="!muted"
         class="border border-black bg-white rounded w-16"
         type="submit"
-        (click)="mute()"
+        (click)="toggleMute()"
       >
-        Mute
+        {{ audioEnabled ? "Mute" : "Unmute" }}
       </button>
       <button
-        *ngIf="muted"
         class="border border-black bg-white rounded w-16"
         type="submit"
-        (click)="unmute()"
+        (click)="toggleCamera()"
       >
-        Unmute
+        {{ videoEnabled ? "Disable" : "Enable" }}
       </button>
+      }
       <textarea
         class="w-full border border-gray-400"
         type="text"
