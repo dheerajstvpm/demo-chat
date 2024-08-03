@@ -4,7 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --base-href /demo-chat/",
+    "move": "mv dist/demo-chat/browser/* docs/",
+    "404": "cp docs/index.html docs/404.html",
+    "push": "git add . && git commit -m \"build files\" && git push",
+    "github": "pnpm run build && pnpm run move && pnpm run 404 && pnpm run push",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
