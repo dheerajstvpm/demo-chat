@@ -52,7 +52,7 @@ export class ChatComponent implements OnInit {
   setMessage(value: IMessage) {
     if (this.inCognito) {
       this.inCognitoMessages = [...this.inCognitoMessages, value];
-    } else if (!['c', 'vc', 'svc'].includes(value.message)) {
+    } else if (!['c', 'vc', 'svc'].includes(value.message.toLowerCase())) {
       const messages = JSON.stringify([...this.getAllMessages(), value]);
       localStorage.setItem(`messages`, messages);
     }
@@ -164,20 +164,20 @@ export class ChatComponent implements OnInit {
       this.disconnect();
       return;
     }
-    if (this.message === '#') {
+    if (this.message.toLowerCase() === '#') {
       this.inCognito = true;
     }
-    if (this.message === 'c') {
+    if (this.message.toLowerCase() === 'c') {
       this.audioEnabled = true;
       this.videoEnabled = false;
       this.updateCall();
     }
-    if (this.message === 'vc') {
+    if (this.message.toLowerCase() === 'vc') {
       this.audioEnabled = true;
       this.videoEnabled = true;
       this.updateCall();
     }
-    if (this.message === 'svc') {
+    if (this.message.toLowerCase() === 'svc') {
       this.audioEnabled = false;
       this.videoEnabled = true;
       this.updateCall();
