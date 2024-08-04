@@ -51,38 +51,6 @@
       </div>
     </div>
     <div class="flex gap-2 z-10">
-      @if (!callConnected) {
-      <button
-        class="border border-black bg-white rounded w-16"
-        type="submit"
-        (click)="call()"
-      >
-        Call
-      </button>
-      } @if (callConnected) {
-      <button
-        class="border border-black bg-white rounded w-16"
-        type="submit"
-        (click)="disconnect()"
-      >
-        Cut
-      </button>
-      } @if (callConnected) {
-      <button
-        class="border border-black bg-white rounded w-16"
-        type="submit"
-        (click)="toggleMute()"
-      >
-        {{ audioEnabled ? "Mute" : "Unmute" }}
-      </button>
-      <button
-        class="border border-black bg-white rounded w-16"
-        type="submit"
-        (click)="toggleCamera()"
-      >
-        {{ videoEnabled ? "Disable" : "Enable" }}
-      </button>
-      }
       <textarea
         class="w-full border border-gray-400"
         type="text"
