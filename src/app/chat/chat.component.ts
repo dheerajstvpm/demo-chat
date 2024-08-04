@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Peer, { MediaConnection } from 'peerjs';
 import { FormsModule } from '@angular/forms';
 import { CdkDrag } from '@angular/cdk/drag-drop';
+import { Router } from '@angular/router';
 
 export interface IMessage {
   peer: string;
@@ -23,8 +24,11 @@ export class ChatComponent implements OnInit {
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
 
   title = 'demo-chat';
+  router = inject(Router);
 
   peer: Peer | undefined;
+  peerId = '';
+  mediaConnectionId = '';
   message = '';
   set messages(value: IMessage[]) {
     const messages = JSON.stringify(value);
@@ -57,9 +61,9 @@ export class ChatComponent implements OnInit {
     if (!this.peer) {
       localStorage.setItem(`peerId`, this.myPeerId);
       this.peer = new Peer(this.myPeerId);
-      this.onReceive();
-      this.onCall();
-      this.onPeerDisconnect();
+      this.onReceive(this.peer);
+      this.onCall(this.peer);
+      this.onPeerDisconnect(this.peer);
     }
   }
 
@@ -79,9 +83,10 @@ export class ChatComponent implements OnInit {
     });
   }
 
-  onReceive() {
-    this.peer?.on('connection', (conn) => {
-      conn.on('data', (data) => {
+  onReceive(peer: Peer) {
+    peer.on('connection', (dataConnection) => {
+      console.log('data connection established');
+      dataConnection.on('data', (data) => {
         const time = new Date();
         const peerMessage: IMessage = {
           peer: 'sender',
@@ -94,34 +99,31 @@ export class ChatComponent implements OnInit {
     });
   }
 
-  onCall() {
-    this.peer?.on('call', async (call) => {
+  onCall(peer: Peer) {
+    peer.on('call', async (mediaConnection) => {
+      console.log('call connected');
+      this.mediaConnectionId = mediaConnection.connectionId;
       this.audioEnabled = true;
-      call.answer(await this.setLocalStream());
-      this.setRemoteStream(call);
-      this.onCallDisconnect(call);
+      mediaConnection.answer(await this.setLocalStream());
+      this.setRemoteStream(mediaConnection);
+      this.onCallDisconnect(mediaConnection);
     });
   }
 
-  onPeerDisconnect() {
-    this.peer?.on('close', () => {
-      this.disconnect();
-    })
-    this.peer?.on('disconnected', () => {
-      this.disconnect();
-    });
-    this.peer?.on('error', () => {
+  onPeerDisconnect(peer: Peer) {
+    peer?.on('error', (error) => {
+      console.log(`peer error : ${error}`);
       this.disconnect();
     });
   }
 
   onCallDisconnect(connection: MediaConnection) {
     connection.on('close', () => {
-      connection.close();
+      console.log('call disconnected');
       this.disconnect();
     })
-    connection.on('error', () => {
-      connection.close();
+    connection.on('error', (error) => {
+      console.log(`call error : ${error}`);
       this.disconnect();
     })
   }
@@ -140,9 +142,9 @@ export class ChatComponent implements OnInit {
       };
       this.message = '';
       this.messages = [...this.messages, myMessage];
-      const conn = this.peer.connect(this.otherPeerId);
-      conn.on('open', () => {
-        conn.send(message);
+      const dataConnection = this.peer.connect(this.otherPeerId);
+      dataConnection.on('open', () => {
+        dataConnection.send(message);
       });
     } else {
       this.createPeer();
@@ -153,9 +155,10 @@ export class ChatComponent implements OnInit {
   async call() {
     if (this.peer) {
       this.audioEnabled = true;
-      const call = this.peer.call(this.otherPeerId, await this.setLocalStream());
-      this.setRemoteStream(call);
-      this.onCallDisconnect(call);
+      const mediaConnection = this.peer.getConnection(this.otherPeerId, this.mediaConnectionId) ?? this.peer.call(this.otherPeerId, await this.setLocalStream());
+      this.mediaConnectionId = mediaConnection.connectionId;
+      this.setRemoteStream(mediaConnection as MediaConnection);
+      this.onCallDisconnect(mediaConnection as MediaConnection);
     } else {
       this.createPeer();
       this.call();
@@ -163,27 +166,31 @@ export class ChatComponent implements OnInit {
   }
 
   async toggleMute() {
-    this.audioEnabled = !this.audioEnabled;
-    this.peer?.call(this.otherPeerId, await this.setLocalStream());
-  }
-
-  async toggleCamera() {
     if (this.peer) {
-      this.videoEnabled = !this.videoEnabled;
-      this.peer.call(this.otherPeerId, await this.setLocalStream());
+      this.audioEnabled = !this.audioEnabled;
+      this.peer?.call(this.otherPeerId, await this.setLocalStream());
     }
   }
 
+  async toggleCamera() {
+    this.videoEnabled = !this.videoEnabled;
+    const mediaConnection = this.peer?.call(this.otherPeerId, await this.setLocalStream());
+    console.log(this.mediaConnectionId === mediaConnection?.connectionId)
+  }
+
   async disconnect() {
-    this.callConnected = false;
-    this.localVideo.nativeElement.srcObject = null;
-    this.remoteVideo.nativeElement.srcObject = null;
-    const stream = await this.setLocalStream();
-    stream.getTracks().forEach(track => {
-      track.stop();
-      stream.removeTrack(track);
-    })
-    this.peer?.destroy();
-    this.peer = undefined;
+    location.reload();
+    // this.mediaConnectionId = '';
+    // this.callConnected = false;
+    // this.localVideo.nativeElement.srcObject = null;
+    // this.remoteVideo.nativeElement.srcObject = null;
+    // const stream = await this.setLocalStream();
+    // stream.getTracks().forEach(track => {
+    //   track.stop();
+    //   stream.removeTrack(track);
+    // })
+    // this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
+    // this.peer?.destroy();
+    // this.peer = new Peer(this.myPeerId);
   }
 }
