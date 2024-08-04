@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Peer, { MediaConnection } from 'peerjs';
 import { FormsModule } from '@angular/forms';
@@ -29,6 +29,8 @@ export class ChatComponent implements OnInit {
 
   peer: Peer | undefined;
   mediaConnectionId = '';
+  inCognito = false;
+  inCognitoMessages: IMessage[] = [];
   set myPeerId(id: string) {
     localStorage.setItem(`peerId`, id);
   }
@@ -47,11 +49,19 @@ export class ChatComponent implements OnInit {
     }
   }
   setMessage(value: IMessage) {
-    const messages = JSON.stringify([...this.getAllMessages(), value]);
-    localStorage.setItem(`messages`, messages);
+    if (!this.inCognito) {
+      const messages = JSON.stringify([...this.getAllMessages(), value]);
+      localStorage.setItem(`messages`, messages);
+    } else {
+      this.inCognitoMessages = [...this.inCognitoMessages, value]
+    }
   }
   get messages() {
-    return this.getAllMessages().length ? this.getAllMessages().filter((item: IMessage) => item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`) : [];
+    if (!this.inCognito) {
+      return this.getAllMessages().length ? this.getAllMessages().filter((item: IMessage) => item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`) : [];
+    } else {
+      return this.inCognitoMessages;
+    }
   }
   callConnected = false;
   audioEnabled = true;
@@ -91,6 +101,15 @@ export class ChatComponent implements OnInit {
     peer.on('connection', (dataConnection) => {
       console.log('data connection established');
       dataConnection.on('data', (data) => {
+        console.log(data);
+        if (data === '#') {
+          this.inCognito = true;
+          return;
+        }
+        if (data === '`') {
+          this.inCognito = false;
+          return;
+        }
         const time = new Date();
         const peerMessage: IMessage = {
           peer: 'sender',
@@ -137,6 +156,16 @@ export class ChatComponent implements OnInit {
     if (this.message === '') {
       return;
     }
+    if (this.message === '#') {
+      this.inCognito = true;
+      this.message = '';
+      return;
+    }
+    if (this.message === '`') {
+      this.inCognito = false;
+      this.message = '';
+      return;
+    }
     if (this.peer) {
       const time = new Date();
       const message = this.message;
@@ -152,9 +181,6 @@ export class ChatComponent implements OnInit {
       dataConnection.on('open', () => {
         dataConnection.send(message);
       });
-    } else {
-      this.createPeer();
-      this.send();
     }
   }
 
@@ -165,23 +191,17 @@ export class ChatComponent implements OnInit {
       this.mediaConnectionId = mediaConnection.connectionId;
       this.setRemoteStream(mediaConnection as MediaConnection);
       this.onCallDisconnect(mediaConnection as MediaConnection);
-    } else {
-      this.createPeer();
-      this.call();
     }
   }
 
   async toggleMute() {
-    if (this.peer) {
-      this.audioEnabled = !this.audioEnabled;
-      this.peer?.call(this.otherPeerId, await this.setLocalStream());
-    }
+    this.audioEnabled = !this.audioEnabled;
+    this.peer?.call(this.otherPeerId, await this.setLocalStream());
   }
 
   async toggleCamera() {
     this.videoEnabled = !this.videoEnabled;
-    const mediaConnection = this.peer?.call(this.otherPeerId, await this.setLocalStream());
-    console.log(this.mediaConnectionId === mediaConnection?.connectionId)
+    this.peer?.call(this.otherPeerId, await this.setLocalStream());
   }
 
   async disconnect() {
