@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 
 export interface IMessage {
   peer: string;
+  peerId: string;
+  otherPeerId: string;
   time: Date;
   message: string;
 }
@@ -27,8 +29,15 @@ export class ChatComponent implements OnInit {
   router = inject(Router);
 
   peer: Peer | undefined;
-  peerId = '';
   mediaConnectionId = '';
+  set myPeerId(id: string) {
+    localStorage.setItem(`peerId`, id);
+  }
+  get myPeerId() { return localStorage.getItem(`peerId`) ?? crypto.randomUUID() };
+  set otherPeerId(id: string) {
+    localStorage.setItem(`otherPeerId`, id);
+  }
+  get otherPeerId() { return localStorage.getItem(`otherPeerId`) ?? `` };
   message = '';
   set messages(value: IMessage[]) {
     const messages = JSON.stringify(value);
@@ -37,18 +46,14 @@ export class ChatComponent implements OnInit {
   get messages() {
     let messages;
     try {
-      messages = JSON.parse(localStorage.getItem(`messages`) ?? 'null');
+      const allMessages = JSON.parse(localStorage.getItem(`messages`) ?? 'null');
+      messages = allMessages.filter((item: IMessage) => item.peerId === this.myPeerId && item.otherPeerId === this.otherPeerId);
     } catch (error) {
       console.log(error);
       messages = [];
     }
     return messages ?? [];
   }
-  myPeerId = localStorage.getItem(`peerId`) ?? crypto.randomUUID();
-  set otherPeerId(id: string) {
-    localStorage.setItem(`otherPeerId`, id);
-  }
-  get otherPeerId() { return localStorage.getItem(`otherPeerId`) ?? `` };
   callConnected = false;
   audioEnabled = true;
   videoEnabled = false;
@@ -90,6 +95,8 @@ export class ChatComponent implements OnInit {
         const time = new Date();
         const peerMessage: IMessage = {
           peer: 'sender',
+          peerId: this.myPeerId,
+          otherPeerId: this.otherPeerId,
           time: time,
           message: data as string,
         };
@@ -137,6 +144,8 @@ export class ChatComponent implements OnInit {
       const message = this.message;
       const myMessage: IMessage = {
         peer: 'me',
+        peerId: this.myPeerId,
+        otherPeerId: this.otherPeerId,
         time: time,
         message: message,
       };
