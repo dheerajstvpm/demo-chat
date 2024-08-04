@@ -36,10 +36,12 @@
       </div>
     </div>
     <div class="chat-container absolute bottom-16 right-0 w-full">
-      <div class="chat-text overflow-auto text-sm font-bold p-2">
+      <div
+        class="chat-text overflow-auto text-sm font-bold p-2 text-border"
+      >
         @for (item of messages; track $index) { @if (item.peer==='sender') {
         <div class="text-left flex flex-col items-start pt-3">
-          <div class="flex gap-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+          <div class="flex gap-2">
             <div>{{ item.time | date : "h:mm:ss a" }}</div>
             <div>{{ item.peer }}</div>
           </div>
@@ -47,7 +49,7 @@
         </div>
         } @if (item.peer==='me') {
         <div class="text-right flex flex-col items-end pt-3">
-          <div class="flex gap-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+          <div class="flex gap-2">
             <div>{{ item.time | date : "h:mm:ss a" }}</div>
             <div>{{ item.peer }}</div>
           </div>
