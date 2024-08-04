@@ -40,24 +40,18 @@ export class ChatComponent implements OnInit {
   message = '';
   getAllMessages(): IMessage[] {
     try {
-      return JSON.parse(localStorage.getItem(`messages`) ?? 'null');
+      return JSON.parse(localStorage.getItem(`messages`) ?? 'null') ?? [];
     } catch (error) {
-      console.log(error);
+      console.log(`err: ${error}`);
       return [];
     }
   }
   setMessage(value: IMessage) {
-    const messages = JSON.stringify({ ...this.getAllMessages(), value });
+    const messages = JSON.stringify([...this.getAllMessages(), value]);
     localStorage.setItem(`messages`, messages);
   }
   get messages() {
-    try {
-      const allMessages = JSON.parse(localStorage.getItem(`messages`) ?? 'null');
-      return allMessages.filter((item: IMessage) => item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`);
-    } catch (error) {
-      console.log(error);
-      return [];
-    }
+    return this.getAllMessages().length ? this.getAllMessages().filter((item: IMessage) => item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`) : [];
   }
   callConnected = false;
   audioEnabled = true;
@@ -191,18 +185,8 @@ export class ChatComponent implements OnInit {
   }
 
   async disconnect() {
+    this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
+    this.peer?.destroy();
     location.reload();
-    // this.mediaConnectionId = '';
-    // this.callConnected = false;
-    // this.localVideo.nativeElement.srcObject = null;
-    // this.remoteVideo.nativeElement.srcObject = null;
-    // const stream = await this.setLocalStream();
-    // stream.getTracks().forEach(track => {
-    //   track.stop();
-    //   stream.removeTrack(track);
-    // })
-    // this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
-    // this.peer?.destroy();
-    // this.peer = new Peer(this.myPeerId);
   }
 }
