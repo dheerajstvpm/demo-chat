@@ -1,9 +1,9 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Peer, { DataConnection, MediaConnection } from 'peerjs';
 import { FormsModule } from '@angular/forms';
 import { CdkDrag } from '@angular/cdk/drag-drop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface IMessage {
   peer: string;
@@ -26,20 +26,15 @@ export class ChatComponent implements OnInit {
 
   title = 'demo-chat';
   router = inject(Router);
+  route = inject(ActivatedRoute);
 
   peer: Peer | undefined;
   mediaConnectionId = '';
   dataConnectionId = '';
   inCognito = false;
   inCognitoMessages: IMessage[] = [];
-  set myPeerId(id: string) {
-    localStorage.setItem(`peerId`, id);
-  }
-  get myPeerId() { return localStorage.getItem(`peerId`) ?? crypto.randomUUID() };
-  set otherPeerId(id: string) {
-    localStorage.setItem(`otherPeerId`, id);
-  }
-  get otherPeerId() { return localStorage.getItem(`otherPeerId`) ?? `` };
+  myPeerId = '1234';
+  otherPeerId = '4321';
   message = '';
   getAllMessages(): IMessage[] {
     try {
@@ -69,7 +64,15 @@ export class ChatComponent implements OnInit {
   videoEnabled = false;
 
   ngOnInit(): void {
-    this.createPeer();
+    this.route.queryParams.subscribe(params => {
+      const param1 = params['param1'];
+      const param2 = params['param2'];
+      if (param1) {
+        this.myPeerId = param1;
+        this.createPeer();
+      }
+      if (param2) this.otherPeerId = param2;
+    });
   }
 
   createPeer() {
