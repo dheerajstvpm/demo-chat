@@ -223,10 +223,4 @@ export class ChatComponent implements OnInit {
     this.peer?.destroy();
     location.reload();
   }
-
-  scrollToBottom() {
-    setTimeout(() => {
-      window.scrollTo(0, document.body.scrollHeight);
-    }, 100);
-  }
 }
