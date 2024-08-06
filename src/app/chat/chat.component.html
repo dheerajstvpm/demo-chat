@@ -1,55 +1,56 @@
-<div
-  class="video-container fixed top-0 left-0 w-full h-full flex justify-center items-center"
->
-  <div class="w-full h-full relative" id="dragBoundary">
-    <video
-      #remoteVideo
-      class="remote-video w-full h-full"
-      autoplay
-      playsinline
-    ></video>
-    <video
-      #localVideo
-      cdkDragBoundary="#dragBoundary"
-      cdkDrag
-      class="local-video absolute top-20 left-2 w-1/4 rounded z-50 cursor-grab"
-      autoplay
-      playsinline
-      [muted]="true"
-    ></video>
-  </div>
-</div>
-<div class="chat-container fixed bottom-16 right-0 w-full">
-  <div class="chat-text overflow-auto text-sm font-bold p-2 text-border">
-    @for (item of messages; track $index) { @if (item.peer==='sender') {
-    <div class="text-left flex flex-col items-start pt-3">
-      <div>{{ item.time | date : "d MMM y, h:mm a" }}</div>
-      <div class="break-words">{{ item.message }}</div>
-    </div>
-    } @if (item.peer==='me') {
-    <div class="text-right flex flex-col items-end pt-3">
-      <div>{{ item.time | date : "d MMM y, h:mm a" }}</div>
-      <div class="break-words">{{ item.message }}</div>
-    </div>
-    } }
-  </div>
-</div>
-<div class="flex w-full p-2 gap-2 fixed bottom-0 z-10">
-  <textarea
-    (focus)="scrollToBottom()"
-    class="w-full border border-gray-400 p-1"
-    type="text"
-    [(ngModel)]="message"
-    name="message"
-    id="message"
-    cols="40"
-    rows="2"
-  ></textarea>
-  <button
-    class="border border-black bg-white rounded w-16"
-    type="submit"
-    (click)="send()"
+<div class="h-dvh w-full">
+  <div
+    class="video-container fixed top-0 left-0 w-full h-full flex justify-center items-center"
   >
-    Send
-  </button>
+    <div class="w-full h-full relative" id="dragBoundary">
+      <video
+        #remoteVideo
+        class="remote-video w-full h-full"
+        autoplay
+        playsinline
+      ></video>
+      <video
+        #localVideo
+        cdkDragBoundary="#dragBoundary"
+        cdkDrag
+        class="local-video absolute top-20 left-2 w-1/4 rounded z-50 cursor-grab"
+        autoplay
+        playsinline
+        [muted]="true"
+      ></video>
+    </div>
+  </div>
+  <div class="chat-container fixed bottom-16 right-0 w-full">
+    <div class="chat-text overflow-auto text-sm font-bold p-2 text-border">
+      @for (item of messages; track $index) { @if (item.peer==='sender') {
+      <div class="text-left flex flex-col items-start pt-3">
+        <div>{{ item.time | date : "d MMM y, h:mm a" }}</div>
+        <div class="break-words">{{ item.message }}</div>
+      </div>
+      } @if (item.peer==='me') {
+      <div class="text-right flex flex-col items-end pt-3">
+        <div>{{ item.time | date : "d MMM y, h:mm a" }}</div>
+        <div class="break-words">{{ item.message }}</div>
+      </div>
+      } }
+    </div>
+  </div>
+  <div class="flex w-full p-2 gap-2 fixed bottom-0 z-10">
+    <textarea
+      class="w-full border border-gray-400 p-1"
+      type="text"
+      [(ngModel)]="message"
+      name="message"
+      id="message"
+      cols="40"
+      rows="2"
+    ></textarea>
+    <button
+      class="border border-black bg-white rounded w-16"
+      type="submit"
+      (click)="send()"
+    >
+      Send
+    </button>
+  </div>
 </div>

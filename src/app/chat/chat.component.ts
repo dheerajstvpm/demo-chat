@@ -225,6 +225,8 @@ export class ChatComponent implements OnInit {
   }
 
   scrollToBottom() {
-    window.scrollTo(0, document.body.scrollHeight);
+    setTimeout(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    }, 100);
   }
 }
