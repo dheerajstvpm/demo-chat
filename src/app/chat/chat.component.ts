@@ -108,6 +108,8 @@ export class ChatComponent implements OnInit {
       dataConnection.on('data', (data) => {
         if (data === '#') {
           this.inCognito = true;
+        } else if (data === '.') {
+          this.inCognito = false;
         }
         const time = new Date();
         const peerMessage: IMessage = {
@@ -166,21 +168,19 @@ export class ChatComponent implements OnInit {
     if (this.message === '') {
       this.disconnect();
       return;
-    }
-    if (this.message.toLowerCase() === '#') {
+    } else if (this.message.toLowerCase() === '#') {
       this.inCognito = true;
-    }
-    if (this.message.toLowerCase() === 'c') {
+    } else if (this.message.toLowerCase() === '.') {
+      this.inCognito = false;
+    } else if (this.message.toLowerCase() === 'c') {
       this.audioEnabled = true;
       this.videoEnabled = false;
       this.updateCall();
-    }
-    if (this.message.toLowerCase() === 'vc') {
+    } else if (this.message.toLowerCase() === 'vc') {
       this.audioEnabled = true;
       this.videoEnabled = true;
       this.updateCall();
-    }
-    if (this.message.toLowerCase() === 'svc') {
+    } else if (this.message.toLowerCase() === 'svc') {
       this.audioEnabled = false;
       this.videoEnabled = true;
       this.updateCall();
