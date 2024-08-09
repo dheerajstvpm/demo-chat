@@ -46,9 +46,9 @@ export class ChatComponent implements OnInit {
   }
   setMessage(value: IMessage) {
     if (this.inCognito) {
-      this.inCognitoMessages = [...this.inCognitoMessages, value];
+      this.inCognitoMessages.unshift(value);
     } else if (!['c', 'vc', 'svc'].includes(value.message.toLowerCase())) {
-      const messages = JSON.stringify([...this.getAllMessages(), value]);
+      const messages = JSON.stringify([value, ...this.getAllMessages()]);
       localStorage.setItem(`messages`, messages);
     }
   }
