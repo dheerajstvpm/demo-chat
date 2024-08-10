@@ -21,9 +21,9 @@
 </div>
 <div class="chat-container h-dvh w-full flex flex-col justify-end items-center">
   <div
-    class="chat-text w-full flex-1 flex flex-col-reverse overflow-auto text-sm font-bold p-2"
+    class="chat-text w-full flex-1 overflow-auto text-sm font-bold p-2"
   >
-    <div class="w-full">
+    <div class="w-full flex flex-col-reverse">
       @for (item of messages; track $index) { @if (item.peer==='sender') {
       <div class="chat chat-start">
         <div class="chat-header">
