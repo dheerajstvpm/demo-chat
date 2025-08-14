@@ -226,8 +226,13 @@ export class ChatComponent implements OnInit {
   }
 
   async updateCall() {
-    this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
-    this.call();
+    this.peer?.call(this.otherPeerId, await this.setLocalStream());
+    (
+      this.peer?.getConnection(
+        this.otherPeerId,
+        this.mediaConnectionId
+      ) as MediaConnection
+    ).addStream(await this.setLocalStream());
   }
 
   async disconnect() {
