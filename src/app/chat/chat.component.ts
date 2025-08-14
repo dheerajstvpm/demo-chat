@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Peer, { DataConnection, MediaConnection } from 'peerjs';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +26,6 @@ export interface IMessage {
   styleUrl: './chat.component.scss',
 })
 export class ChatComponent implements OnInit {
-
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideo') remoteVideo!: ElementRef<HTMLVideoElement>;
 
@@ -36,7 +41,7 @@ export class ChatComponent implements OnInit {
   myPeerId = '1234';
   otherPeerId = '4321';
   message = '';
-  getAllMessages(): IMessage[] {
+  get allMessages(): IMessage[] {
     try {
       return JSON.parse(localStorage.getItem(`messages`) ?? 'null') ?? [];
     } catch (error) {
@@ -44,17 +49,22 @@ export class ChatComponent implements OnInit {
       return [];
     }
   }
-  setMessage(value: IMessage) {
+  set chatMessage(value: IMessage) {
     if (this.inCognito) {
       this.inCognitoMessages.unshift(value);
     } else if (!['c', 'vc', 'svc'].includes(value.message.toLowerCase())) {
-      const messages = JSON.stringify([value, ...this.getAllMessages()]);
+      const messages = JSON.stringify([value, ...this.allMessages]);
       localStorage.setItem(`messages`, messages);
     }
   }
   get messages() {
     if (!this.inCognito) {
-      return this.getAllMessages().length ? this.getAllMessages().filter((item: IMessage) => item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`) : [];
+      return this.allMessages.length
+        ? this.allMessages.filter(
+            (item: IMessage) =>
+              item.peerMsgId === `${this.myPeerId}${this.otherPeerId}`
+          )
+        : [];
     } else {
       return this.inCognitoMessages;
     }
@@ -64,9 +74,9 @@ export class ChatComponent implements OnInit {
   videoEnabled = false;
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      const param1 = params['param1'];
-      const param2 = params['param2'];
+    this.route.queryParams.subscribe((params) => {
+      const param1 = params['peer1'];
+      const param2 = params['peer2'];
       if (param1) {
         this.myPeerId = param1;
         this.createPeer();
@@ -118,8 +128,7 @@ export class ChatComponent implements OnInit {
           time: time,
           message: data as string,
         };
-        this.setMessage(peerMessage);
-        console.log(data);
+        this.chatMessage = peerMessage;
       });
       this.onChatDisconnect(dataConnection);
     });
@@ -146,22 +155,22 @@ export class ChatComponent implements OnInit {
     connection.on('close', () => {
       console.log('chat disconnected');
       this.disconnect();
-    })
+    });
     connection.on('error', (error) => {
       console.log(`chat error : ${error}`);
       this.disconnect();
-    })
+    });
   }
 
   onCallDisconnect(connection: MediaConnection) {
     connection.on('close', () => {
       console.log('call disconnected');
       this.disconnect();
-    })
+    });
     connection.on('error', (error) => {
       console.log(`call error : ${error}`);
       this.disconnect();
-    })
+    });
   }
 
   send() {
@@ -195,7 +204,7 @@ export class ChatComponent implements OnInit {
         message: message,
       };
       this.message = '';
-      this.setMessage(myMessage);
+      this.chatMessage = myMessage;
       const dataConnection = this.peer.connect(this.otherPeerId);
       this.dataConnectionId = dataConnection.connectionId;
       dataConnection.on('open', () => {
@@ -206,7 +215,10 @@ export class ChatComponent implements OnInit {
 
   async call() {
     if (this.peer) {
-      const mediaConnection = this.peer.call(this.otherPeerId, await this.setLocalStream());
+      const mediaConnection = this.peer.call(
+        this.otherPeerId,
+        await this.setLocalStream()
+      );
       this.mediaConnectionId = mediaConnection.connectionId;
       this.setRemoteStream(mediaConnection as MediaConnection);
       this.onCallDisconnect(mediaConnection as MediaConnection);
@@ -214,7 +226,8 @@ export class ChatComponent implements OnInit {
   }
 
   async updateCall() {
-    this.peer?.call(this.otherPeerId, await this.setLocalStream());
+    this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
+    this.call();
   }
 
   async disconnect() {
