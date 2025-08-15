@@ -4,11 +4,12 @@
   "packageManager": "pnpm@10.14.0",
   "scripts": {
     "404": "cp docs/index.html docs/404.html",
+    "move": "mv docs/browser/* docs/",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --base-href /demo-chat/",
     "push": "git add . && git commit -m \"build files\" && git push",
-    "github": "pnpm run build && pnpm run 404 && pnpm run push",
+    "github": "npm run build && npm run move && npm run 404 && npm run push",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
