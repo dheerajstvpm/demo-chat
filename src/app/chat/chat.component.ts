@@ -19,11 +19,10 @@ export interface IMessage {
 }
 
 @Component({
-  selector: 'app-chat',
-  standalone: true,
-  imports: [CommonModule, FormsModule, CdkDrag],
-  templateUrl: './chat.component.html',
-  styleUrl: './chat.component.scss',
+    selector: 'app-chat',
+    imports: [CommonModule, FormsModule, CdkDrag],
+    templateUrl: './chat.component.html',
+    styleUrl: './chat.component.scss'
 })
 export class ChatComponent implements OnInit {
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
