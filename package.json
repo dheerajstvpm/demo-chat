@@ -1,6 +1,7 @@
 {
   "name": "demo-chat",
   "version": "0.0.0",
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "404": "cp docs/index.html docs/404.html",
     "ng": "ng",
