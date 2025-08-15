@@ -22,7 +22,7 @@ export interface IMessage {
     selector: 'app-chat',
     imports: [CommonModule, FormsModule, CdkDrag],
     templateUrl: './chat.component.html',
-    styleUrl: './chat.component.scss'
+    styleUrl: './chat.component.css'
 })
 export class ChatComponent implements OnInit {
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
