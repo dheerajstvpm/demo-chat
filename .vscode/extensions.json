@@ -7,9 +7,6 @@
     "usernamehw.errorlens",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    "vscodevim.vim",
-    "vintharas.learn-vim",
-    "TomRijndorp.find-it-faster",
     "bradlc.vscode-tailwindcss"
   ]
 }

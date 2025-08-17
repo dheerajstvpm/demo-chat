@@ -33,8 +33,8 @@ export class ChatComponent implements OnInit {
   route = inject(ActivatedRoute);
 
   peer: Peer | undefined;
-  mediaConnectionId = '';
-  dataConnectionId = '';
+  // mediaConnectionId = '';
+  // dataConnectionId = '';
   inCognito = false;
   inCognitoMessages: IMessage[] = [];
   myPeerId = '1234';
@@ -74,14 +74,13 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
-      const param1 = params['peer1'];
-      const param2 = params['peer2'];
-      if (!(param1 && param2)) {
-        alert(`add peers to continue.`);
+      const peer1 = params['peer1'];
+      const peer2 = params['peer2'];
+      if (peer1 && peer2) {
+        this.myPeerId = peer1;
+        this.createPeer();
+        this.otherPeerId = peer2;
       }
-      this.myPeerId = param1;
-      this.createPeer();
-      this.otherPeerId = param2;
     });
   }
 
@@ -114,7 +113,7 @@ export class ChatComponent implements OnInit {
   onReceive(peer: Peer) {
     peer.on('connection', (dataConnection) => {
       console.log('data connection established');
-      this.dataConnectionId = dataConnection.connectionId;
+      // this.dataConnectionId = dataConnection.connectionId;
       dataConnection.on('data', (data) => {
         if (data === '#') {
           this.inCognito = true;
@@ -137,7 +136,7 @@ export class ChatComponent implements OnInit {
   onCall(peer: Peer) {
     peer.on('call', async (mediaConnection) => {
       console.log('call connected');
-      this.mediaConnectionId = mediaConnection.connectionId;
+      // this.mediaConnectionId = mediaConnection.connectionId;
       mediaConnection.answer(await this.setLocalStream());
       this.setRemoteStream(mediaConnection);
       this.onCallDisconnect(mediaConnection);
@@ -145,70 +144,84 @@ export class ChatComponent implements OnInit {
   }
 
   onPeerDisconnect(peer: Peer) {
+    peer.on('disconnected', () => {
+      alert('Connection ended');
+    });
     peer?.on('error', (error) => {
       console.log(`peer error : ${error}`);
-      this.disconnect(error.message);
+      this.onDisconnect(error.message);
     });
   }
 
   onChatDisconnect(connection: DataConnection) {
     connection.on('close', () => {
-      this.disconnect('Chat disconnected');
+      this.onDisconnect('Chat disconnected');
     });
     connection.on('error', (error) => {
       console.log(`chat error : ${error}`);
-      this.disconnect(error.message);
+      this.onDisconnect(error.message);
     });
   }
 
   onCallDisconnect(connection: MediaConnection) {
     connection.on('close', () => {
-      this.disconnect('Call disconnected');
+      this.onDisconnect('Call disconnected');
     });
     connection.on('error', (error) => {
       console.log(`call error : ${error}`);
-      this.disconnect(error.message);
+      this.onDisconnect(error.message);
     });
   }
 
-  send() {
-    if (this.message === '') {
-      this.disconnect(`Connection ended`);
+  async send() {
+    if (!this.peer) {
       return;
-    } else if (this.message.toLowerCase() === '#') {
-      this.inCognito = true;
-    } else if (this.message.toLowerCase() === '.') {
-      this.inCognito = false;
-    } else if (this.message.toLowerCase() === 'c') {
+    }
+    if (this.message === '') {
+      if (confirm(`Are you sure you want to disconnect?`)) {
+        this.peer?.destroy();
+      }
+      return;
+    }
+    if (this.message.toLowerCase() === 'c') {
       this.audioEnabled = true;
       this.videoEnabled = false;
-      this.updateCall();
-    } else if (this.message.toLowerCase() === 'vc') {
+      this.call();
+      return;
+    }
+    if (this.message.toLowerCase() === 'vc') {
       this.audioEnabled = true;
       this.videoEnabled = true;
-      this.updateCall();
-    } else if (this.message.toLowerCase() === 'svc') {
+      this.call();
+      return;
+    }
+    if (this.message.toLowerCase() === 'svc') {
       this.audioEnabled = false;
       this.videoEnabled = true;
-      this.updateCall();
+      this.call();
+      return;
     }
-    if (this.peer) {
-      const time = new Date();
-      const message = this.message;
-      const myMessage: IMessage = {
-        peer: 'me',
-        peerMsgId: `${this.myPeerId}${this.otherPeerId}`,
-        time: time,
-        message: message,
-      };
-      this.message = '';
+    if (this.message === '#') {
+      this.inCognito = true;
+    } else if (this.message === '.') {
+      this.inCognito = false;
+    }
+
+    const time = new Date();
+    const message = this.message;
+    const myMessage: IMessage = {
+      peer: 'me',
+      peerMsgId: `${this.myPeerId}${this.otherPeerId}`,
+      time: time,
+      message: message,
+    };
+    this.message = '';
+    const dataConnection = this.peer.connect(this.otherPeerId);
+    // this.dataConnectionId = dataConnection.connectionId;
+    dataConnection.on('open', () => {
       this.chatMessage = myMessage;
-      const dataConnection = this.peer.connect(this.otherPeerId);
-      this.dataConnectionId = dataConnection.connectionId;
-      dataConnection.on('open', () => {
-        dataConnection.send(message);
-      });
-    }
+      dataConnection.send(message);
+    });
   }
 
   async call() {
@@ -217,18 +230,13 @@ export class ChatComponent implements OnInit {
         this.otherPeerId,
         await this.setLocalStream()
       );
-      this.mediaConnectionId = mediaConnection.connectionId;
+      // this.mediaConnectionId = mediaConnection.connectionId;
       this.setRemoteStream(mediaConnection as MediaConnection);
       this.onCallDisconnect(mediaConnection as MediaConnection);
     }
   }
 
-  async updateCall() {
-    this.peer?.call(this.otherPeerId, await this.setLocalStream());
-  }
-
-  async disconnect(message: string) {
-    this.peer?.destroy();
+  async onDisconnect(message: string) {
     if (confirm(`${message}. Reload the page to try again.`)) {
       location.reload();
     }
