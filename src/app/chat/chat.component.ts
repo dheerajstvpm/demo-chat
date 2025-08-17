@@ -19,10 +19,10 @@ export interface IMessage {
 }
 
 @Component({
-    selector: 'app-chat',
-    imports: [CommonModule, FormsModule, CdkDrag],
-    templateUrl: './chat.component.html',
-    styleUrl: './chat.component.css'
+  selector: 'app-chat',
+  imports: [CommonModule, FormsModule, CdkDrag],
+  templateUrl: './chat.component.html',
+  styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit {
   @ViewChild('localVideo') localVideo!: ElementRef<HTMLVideoElement>;
@@ -146,35 +146,33 @@ export class ChatComponent implements OnInit {
   onPeerDisconnect(peer: Peer) {
     peer?.on('error', (error) => {
       console.log(`peer error : ${error}`);
-      this.disconnect();
+      this.disconnect(error.message);
     });
   }
 
   onChatDisconnect(connection: DataConnection) {
     connection.on('close', () => {
-      console.log('chat disconnected');
-      this.disconnect();
+      this.disconnect('Chat disconnected');
     });
     connection.on('error', (error) => {
       console.log(`chat error : ${error}`);
-      this.disconnect();
+      this.disconnect(error.message);
     });
   }
 
   onCallDisconnect(connection: MediaConnection) {
     connection.on('close', () => {
-      console.log('call disconnected');
-      this.disconnect();
+      this.disconnect('Call disconnected');
     });
     connection.on('error', (error) => {
       console.log(`call error : ${error}`);
-      this.disconnect();
+      this.disconnect(error.message);
     });
   }
 
   send() {
     if (this.message === '') {
-      this.disconnect();
+      this.disconnect(`Connection ended`);
       return;
     } else if (this.message.toLowerCase() === '#') {
       this.inCognito = true;
@@ -226,18 +224,12 @@ export class ChatComponent implements OnInit {
 
   async updateCall() {
     this.peer?.call(this.otherPeerId, await this.setLocalStream());
-    (
-      this.peer?.getConnection(
-        this.otherPeerId,
-        this.mediaConnectionId
-      ) as MediaConnection
-    ).addStream(await this.setLocalStream());
   }
 
-  async disconnect() {
-    this.peer?.getConnection(this.otherPeerId, this.mediaConnectionId)?.close();
-    this.peer?.getConnection(this.otherPeerId, this.dataConnectionId)?.close();
+  async disconnect(message: string) {
     this.peer?.destroy();
-    location.reload();
+    if (confirm(`${message}. Reload the page to try again.`)) {
+      location.reload();
+    }
   }
 }
