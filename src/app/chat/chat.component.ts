@@ -76,11 +76,12 @@ export class ChatComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       const param1 = params['peer1'];
       const param2 = params['peer2'];
-      if (param1) {
-        this.myPeerId = param1;
-        this.createPeer();
+      if (!(param1 && param2)) {
+        alert(`add peers to continue.`);
       }
-      if (param2) this.otherPeerId = param2;
+      this.myPeerId = param1;
+      this.createPeer();
+      this.otherPeerId = param2;
     });
   }
 
